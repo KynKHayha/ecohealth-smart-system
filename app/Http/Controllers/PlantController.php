@@ -2,82 +2,85 @@
 
 namespace App\Http\Controllers;
 
-// Hapus yang lama, ganti jadi ini:
 use App\Models\Tip;
 use App\Models\Plant;
+use App\Models\Lansia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PlantController extends Controller
 {
-    // Tampilan Landing Page
+    // Tampilan Landing Page untuk Publik
     public function index() {
         $plants = Plant::all();
         return view('welcome', compact('plants'));
     }
 
-    // Dashboard Admin dengan Fitur Filter RW
+    // Dashboard Admin Utama
     public function dashboard(Request $request) {
-    $query = Plant::query();
+        $query = Plant::query();
 
-    // Fitur Filter RW
-    if ($request->has('rw') && $request->rw != '') {
-        $query->where('rw', $request->rw);
+        // Fitur Filter RW
+        if ($request->has('rw') && $request->rw != '') {
+            $query->where('rw', $request->rw);
+        }
+
+        $plants = $query->get();
+        $total_bibit = $query->sum('stok');
+        $stok_menipis = $query->clone()->whereColumn('stok', '<=', 'min_stok')->count();
+        
+        // Data Tips untuk Dashboard
+        $tips = Tip::all(); 
+
+        // STATISTIK UNTUK GRAFIK (Chart.js)
+        $stats = [
+            'Hipertensi' => Lansia::where('penyakit', 'like', '%hipertensi%')->count(),
+            'Asam Urat'  => Lansia::where('penyakit', 'like', '%asam urat%')->count(),
+            'Diabetes'   => Lansia::where('penyakit', 'like', '%diabetes%')->count(),
+            'Sehat'      => Lansia::where('penyakit', 'tidak ada')->count(),
+        ];
+        
+        $lansias = Lansia::all();
+        $locations = \App\Models\Location::all();
+        
+        return view('dashboard', compact('plants', 'total_bibit', 'stok_menipis', 'tips', 'stats', 'lansias', 'locations'));
     }
-
-    $plants = $query->get();
-    $total_bibit = $query->sum('stok');
-    $stok_menipis = $query->clone()->whereColumn('stok', '<=', 'min_stok')->count();
-    
-    // TAMBAHKAN BARIS INI untuk mengambil data tips dari database
-    $tips = \App\Models\Tip::all(); 
-    
-    // MASUKKAN 'tips' ke dalam compact
-    return view('dashboard', compact('plants', 'total_bibit', 'stok_menipis', 'tips'));
-}
 
     public function create() {
         return view('tambah'); 
     }
 
-    // Simpan data tanaman baru (Termasuk data RW)
     public function store(Request $request) {
         $imageName = null;
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            $imageName = time() . '.' . $file->getClientOriginalExtension();
+                        $imageName = time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('images/plants'), $imageName);
         }
-
         Plant::create([
             'nama_tanaman' => $request->nama_tanaman,
             'nama_latin'   => $request->nama_latin,
             'image'        => $imageName,
             'kategori'     => $request->kategori,
-            'rw'           => $request->rw, // Menyimpan pilihan RW
+            'rw'           => $request->rw,
             'manfaat'      => $request->manfaat,
             'cara_olah'    => $request->cara_olah,
             'stok'         => $request->stok,
             'min_stok'     => 10,
             'slug'         => Str::slug($request->nama_tanaman)
         ]);
-
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')->with('success', 'Tanaman berhasil ditambah!');
     }
-
     public function edit($id) {
         $plant = Plant::findOrFail($id);
         return view('edit', compact('plant'));
     }
-public function update(Request $request, $id) {
+    public function update(Request $request, $id) {
         $plant = Plant::findOrFail($id);
-        
-        // Mengambil semua input dari form edit (termasuk stok, rw, manfaat, cara_olah)
         $data = $request->all();
-
         if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada file baru yang diunggah
             if ($plant->image && file_exists(public_path('images/plants/' . $plant->image))) {
                 unlink(public_path('images/plants/' . $plant->image));
             }
@@ -86,108 +89,103 @@ public function update(Request $request, $id) {
             $file->move(public_path('images/plants'), $imageName);
             $data['image'] = $imageName;
         }
-
-        // Update slug jika nama tanaman diganti
         $data['slug'] = Str::slug($request->nama_tanaman);
-        
-        // Perintah update ini akan otomatis mencocokkan nama input di form dengan kolom di database
         $plant->update($data);
-
-        return redirect()->route('dashboard')->with('success', 'Berhasil diupdate!');
+        return redirect()->route('dashboard')->with('success', 'Data berhasil diperbarui!');
     }
-    public function updateStock(Request $request, $id) {
-        $plant = Plant::findOrFail($id);
-        $plant->stok = $request->stok;
-        $plant->save();
-        return back();
-    }
-
     public function destroy($id) {
         $plant = Plant::findOrFail($id);
         if ($plant->image && file_exists(public_path('images/plants/' . $plant->image))) {
             unlink(public_path('images/plants/' . $plant->image));
         }
         $plant->delete();
+        return back()->with('success', 'Tanaman dihapus!');
+    }
+
+    
+    public function koleksi(Request $request) {
+        $query = Plant::query();
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama_tanaman', 'like', '%' . $search . '%')
+                  ->orWhere('manfaat', 'like', '%' . $search . '%');
+            });
+        }
+        $plants = $query->get();
+        return view('koleksi', compact('plants'));
+    }
+    public function detail($slug) {
+        $plant = Plant::where('slug', $slug)->firstOrFail();
+        return view('detail', compact('plant'));
+    }
+    public function cetakLaporan() {
+        $plants = Plant::all();
+        $total_bibit = Plant::sum('stok');
+        $tanggal = date('d F Y');
+        $pdf = Pdf::loadView('admin.laporan_pdf', compact('plants', 'total_bibit', 'tanggal'));
+        return $pdf->download('Laporan_EcoHealth_'.date('Ymd').'.pdf');
+    }
+    // --- MANAJEMEN TIPS ---
+    public function manageTips() {
+        $tips = Tip::all();
+        return view('admin.tips', compact('tips'));
+    }
+    public function storeTip(Request $request) {
+        $request->validate([
+            'judul'       => 'required|string|max:255',
+            'tag'         => 'required|string|max:100',
+            'deskripsi'   => 'required|string',
+            'icon'        => 'nullable|string|max:10',
+            'image_file'  => 'nullable|image|max:2048',
+            'image_url'   => 'nullable|url|max:500',
+        ]);
+
+        $imagePath = null;
+
+        // Prioritas 1: file upload
+        if ($request->hasFile('image_file')) {
+            $imagePath = $request->file('image_file')->store('tips', 'public');
+        }
+        // Prioritas 2: URL gambar
+        elseif ($request->filled('image_url')) {
+            $imagePath = $request->image_url;
+        }
+
+        Tip::create([
+            'judul'    => $request->judul,
+            'tag'      => $request->tag,
+            'deskripsi'=> $request->deskripsi,
+            'icon'     => $request->icon,
+            'image'    => $imagePath,
+        ]);
+
+        return back()->with('success', 'Tips berhasil ditambahkan!');
+    }
+    public function destroyTip($id) {
+        Tip::destroy($id);
         return back();
     }
-
-public function koleksi(Request $request) {
-    $query = Plant::query();
-
-    // Fitur Pencarian (Cari berdasarkan nama atau manfaat)
-    if ($request->has('search') && $request->search != '') {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('nama_tanaman', 'like', '%' . $search . '%')
-              ->orWhere('manfaat', 'like', '%' . $search . '%')
-              ->orWhere('kategori', 'like', '%' . $search . '%');
-        });
+    public function tips() {
+        $tips = \App\Models\Tip::all(); 
+        return view('tips', compact('tips'));
     }
 
-    // Filter berdasarkan RW (Tetap ada)
-    if ($request->has('rw') && $request->rw != '') {
-        $query->where('rw', $request->rw);
+    public function sendEmail(Request $request)
+    {
+        // Validasi semua field yang wajib diisi
+        $validated = $request->validate([
+            'name'    => 'required|string|max:100',
+            'email'   => 'required|email',
+            'subject' => 'required|string|max:200',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        // Kirim email ke alamat yang dikonfigurasi di .env
+        // Ubah CONTACT_RECIPIENT_EMAIL di .env untuk ganti tujuan email
+        \Illuminate\Support\Facades\Mail::to(env('CONTACT_RECIPIENT_EMAIL'))
+            ->send(new \App\Mail\ContactMail($validated));
+
+        return back()->with('success', 'Pesan berhasil dikirim ke Gmail Desa!');
     }
-
-    $plants = $query->get();
-    
-    return view('koleksi', compact('plants'));
-}
-
-public function detail($slug) {
-    $plant = Plant::where('slug', $slug)->firstOrFail();
-    return view('detail', compact('plant'));
-}
-public function printLabel($id) {
-    $plant = Plant::findOrFail($id);
-    return view('print', compact('plant'));
-}
-public function Tips() {
-    // Pastikan pakai Eloquent seperti ini agar jadi Object
-    $tips = \App\Models\Tip::all(); 
-    
-    return view('tips', compact('tips'));
-}
-
-// Simpan Tips Baru
-public function storeTip(Request $request) 
-{
-    // Ini cara paling aman biar gak error "MassAssignment"
-    $tip = new \App\Models\Tip;
-    $tip->judul = $request->judul;
-    $tip->icon = $request->icon;
-    $tip->tag = $request->tag;
-    $tip->deskripsi = $request->deskripsi;
-    $tip->save();
-
-    return redirect()->back()->with('success', 'Tips Berhasil Ditambah!');
-}
-
-// Update Tips
-public function updateTip(Request $request, $id) {
-    $tip = Tip::findOrFail($id);
-    $tip->update($request->all());
-    return back()->with('success', 'Tips berhasil diperbarui!');
-}
-
-// Hapus Tips
-public function destroyTip($id) {
-    Tip::destroy($id);
-    return back();
-}
-public function manageTips() {
-    $tips = Tip::all();
-    return view('admin.tips', compact('tips'));
-}
-public function cetakLaporan() {
-    $plants = Plant::all();
-    $total_bibit = Plant::sum('stok');
-    $tanggal = date('d F Y');
-
-    // Mengarahkan ke file blade khusus laporan
-    $pdf = Pdf::loadView('admin.laporan_pdf', compact('plants', 'total_bibit', 'tanggal'));
-    
-    // Download otomatis dengan nama file tertentu
-    return $pdf->download('Laporan_Stok_EcoHealth_'.date('Ymd').'.pdf');
-}
 }

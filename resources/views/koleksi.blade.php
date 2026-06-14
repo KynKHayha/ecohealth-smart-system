@@ -1,133 +1,124 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Koleksi Herbal Desa Mekarjaya | Eco Health</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-<style>
-    body { 
-        font-family: 'Plus Jakarta Sans', sans-serif; 
-    }
-    .bg-soft-matte {
-        background-color: #f0f4f2; /* Pakai yang Opsi 1 */
-        min-height: 100vh;
-    }
-    /* Pastikan Card-nya Putih Bersih */
-    .card-style {
-        background-color: #ffffff;
-        border: 1px solid rgba(0,0,0,0.03);
-    }
-    .glass-nav {
-        background: rgba(241, 245, 249, 0.8); /* Menyesuaikan bg baru */
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-    }
-    .card-shadow {
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-    }
-    .card-hover:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 30px 50px -12px rgba(15, 23, 42, 0.1); /* Shadow lebih gelap dan dalam */
-    }
-</style>
-</head>
-<body class="bg-soft-matte min-h-screen text-slate-800">
+@extends('layouts.app')
 
-    <nav class="sticky top-0 z-50 glass-nav border-b border-slate-200/60 p-5">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="{{ route('index') }}" class="flex items-center gap-2 group">
-                <img src="{{ asset('images/Logo_ppk.jpeg') }}" alt="Logo PPK" class="w-12 h-12 object-contain group-hover:scale-110 transition duration-300">
-                <span class="font-800 text-xl tracking-tighter text-slate-900">EcoHealth</span>
-            </a>
-            <a href="{{ route('index') }}" class="px-5 py-2 rounded-full bg-slate-200/50 text-xs font-black uppercase tracking-widest text-slate-600 hover:bg-emerald-600 hover:text-white transition-all">← Beranda</a>
-        </div>
-    </nav>
+@section('title', 'Koleksi Herbal | Eco Health Mekarjaya')
+@section('meta_desc', 'Jelajahi koleksi tanaman obat TOGA yang dikelola warga Desa Mekarjaya.')
 
-    <header class="pt-20 pb-16 px-6">
-        <div class="max-w-7xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-900/5 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 border border-emerald-900/10">
-                <span class="relative flex h-2 w-2">
+@section('content')
+<div class="pt-20">
+    {{-- ===== HEADER ===== --}}
+    <header class="py-16 sm:py-24 px-4 sm:px-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto text-center" data-aos="fade-up">
+            <div class="inline-flex px-4 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full text-xs font-black uppercase tracking-widest mb-5">
+                <span class="relative flex h-2 w-2 mr-2 mt-0.5">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
                 Katalog Digital Desa
             </div>
-            <h1 class="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter mb-6 leading-[0.9]">
-                Koleksi <span class="text-emerald-700">Herbal</span> <br>Mekarjaya
+            <h1 class="text-4xl sm:text-6xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tight mb-5 leading-tight">
+                Koleksi <span class="text-emerald-600">Herbal</span><br class="hidden sm:block"> Mekarjaya
             </h1>
-            <p class="text-lg text-slate-500 max-w-xl mx-auto font-medium leading-relaxed">
-                Jelajahi apotek hidup yang dikelola secara gotong royong oleh warga di setiap wilayah.
+            <p class="text-slate-500 dark:text-slate-400 text-lg max-w-xl mx-auto font-medium">
+                Apotek hidup yang dikelola secara gotong royong oleh warga di setiap wilayah.
             </p>
         </div>
     </header>
-    <section class="max-w-7xl mx-auto px-6 mb-16">
-        <div class="bg-white/60 backdrop-blur-md p-2 rounded-[2.5rem] border border-white shadow-xl shadow-slate-200/50 flex flex-wrap justify-center gap-2">
-            <a href="{{ route('plant.koleksi') }}" 
-               class="px-8 py-4 rounded-[2rem] font-bold text-sm transition-all duration-300 {{ !request('rw') ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' : 'text-slate-500 hover:bg-white hover:shadow-sm' }}">
-               🌏 Semua Wilayah
-            </a>
-            @foreach(['2', '3', '4'] as $rw)
-            <a href="{{ route('plant.koleksi', ['rw' => $rw]) }}" 
-               class="px-8 py-4 rounded-[2rem] font-bold text-sm transition-all duration-300 {{ request('rw') == $rw ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' : 'text-slate-500 hover:bg-white hover:shadow-sm' }}">
-               📍 RW 0{{ $rw }}
-            </a>
-            @endforeach
-        </div>
-    </section>
 
-    <main class="max-w-7xl mx-auto px-6 pb-32">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            @forelse($plants as $p)
-            <div class="group card-hover bg-white rounded-[3.5rem] p-4 border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-900/10 transition-all duration-500">
-                <div class="relative h-80 rounded-[2.8rem] overflow-hidden mb-6 shadow-inner bg-slate-100">
-                    <img src="{{ asset('images/plants/' . $p->image) }}" class="w-full h-full object-cover transition duration-700">
-                    
-                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-sm border border-white/50">
-                        <p class="text-[10px] font-black text-emerald-600 uppercase tracking-tighter">Unit Lokasi</p>
-                        <p class="text-sm font-bold text-slate-900">RW 0{{ $p->rw }}</p>
-                    </div>
-
-                    <div class="absolute bottom-4 left-4">
-                        <span class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg">
-                            {{ $p->kategori }}
-                        </span>
-                    </div>
+    {{-- ===== FILTER & SEARCH ===== --}}
+    <div class="sticky top-16 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 py-4 px-4 sm:px-6">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {{-- Search --}}
+            <form method="GET" action="{{ route('plant.koleksi') }}" class="flex-grow flex items-center">
+                <div class="relative w-full">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama tanaman atau manfaat..."
+                        class="w-full pl-11 pr-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-sm font-medium text-slate-700 dark:text-slate-200 placeholder:text-slate-400 outline-none transition-all">
                 </div>
+            </form>
 
-                <div class="px-4 pb-6">
-                    <h3 class="text-3xl font-800 text-slate-900 leading-none mb-2 group-hover:text-emerald-600 transition">{{ $p->nama_tanaman }}</h3>
-                    <p class="text-slate-400 font-medium italic text-lg mb-6 leading-none">{{ $p->nama_latin }}</p>
-                    
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="flex-1">
-                            <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Status Stok</p>
-                            <div class="flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full {{ $p->stok > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500' }}"></div>
-                                <span class="text-sm font-bold text-slate-700">{{ $p->stok }} Bibit Tersedia</span>
-                            </div>
-                        </div>
-                        <a href="{{ route('plant.detail', $p->slug) }}" 
-                           class="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center group-hover:bg-emerald-600 group-hover:rotate-[360deg] transition-all duration-700 shadow-xl shadow-slate-900/20">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                           </svg>
-                        </a>
-                    </div>
-                </div>
+            {{-- RW Filter --}}
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <a href="{{ route('plant.koleksi') }}"
+                   class="px-4 py-3 rounded-2xl text-sm font-bold transition-all {{ !request('rw') && !request('search') ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
+                    Semua
+                </a>
+                @foreach(['2','3','4'] as $rw)
+                <a href="{{ route('plant.koleksi', ['rw' => $rw]) }}"
+                   class="px-4 py-3 rounded-2xl text-sm font-bold transition-all {{ request('rw') == $rw ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700' }}">
+                    RW 0{{ $rw }}
+                </a>
+                @endforeach
             </div>
+        </div>
+    </div>
+
+    {{-- ===== PLANT GRID ===== --}}
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+        {{-- Result info --}}
+        <div class="flex items-center justify-between mb-8">
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                Menampilkan <span class="font-black text-slate-900 dark:text-white">{{ $plants->count() }}</span> tanaman
+                @if(request('rw')) di <span class="font-black text-emerald-600">RW 0{{ request('rw') }}</span>@endif
+                @if(request('search')) untuk "<span class="font-black text-emerald-600">{{ request('search') }}</span>"@endif
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+            @forelse($plants as $p)
+            <a href="{{ route('plant.detail', $p->slug) }}"
+               class="group block bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-2xl hover:shadow-emerald-900/10 dark:hover:shadow-black/30 hover:-translate-y-2 transition-all duration-400"
+               data-aos="fade-up" data-aos-delay="{{ ($loop->index % 4) * 60 }}">
+
+                {{-- Image --}}
+                <div class="relative h-48 sm:h-52 overflow-hidden bg-slate-100 dark:bg-slate-700">
+                    <img src="{{ asset('images/plants/' . $p->image) }}" alt="{{ $p->nama_tanaman }}"
+                         class="w-full h-full object-cover group-hover:scale-110 transition duration-600">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition duration-400"></div>
+
+                    {{-- Badges --}}
+                    <div class="absolute top-3 left-3">
+                        <span class="bg-emerald-500 text-white px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider">{{ $p->kategori }}</span>
+                    </div>
+                    <div class="absolute top-3 right-3">
+                        <span class="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded-xl text-[10px] font-bold">RW 0{{ $p->rw }}</span>
+                    </div>
+
+                    {{-- Stock status overlay --}}
+                    @if($p->stok <= 0)
+                    <div class="absolute inset-0 bg-red-900/40 flex items-center justify-center">
+                        <span class="bg-red-500 text-white px-4 py-1.5 rounded-full text-xs font-black uppercase">Stok Habis</span>
+                    </div>
+                    @endif
+                </div>
+
+                {{-- Info --}}
+                <div class="p-5">
+                    <h3 class="text-lg font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition mb-1 leading-tight">{{ $p->nama_tanaman }}</h3>
+                    <p class="text-emerald-600 dark:text-emerald-400 italic text-xs font-medium mb-4">{{ $p->nama_latin }}</p>
+
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <div class="w-1.5 h-1.5 rounded-full {{ $p->stok > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-red-400' }}"></div>
+                            <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400">{{ $p->stok }} bibit</span>
+                        </div>
+                        <div class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center group-hover:bg-emerald-600 transition-all">
+                            <svg class="w-4 h-4 text-emerald-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
             @empty
-            <div class="col-span-full py-20 text-center">
-                <div class="w-32 h-32 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-5xl">🔍</div>
-                <h3 class="text-3xl font-black text-slate-900">Belum Ada Data</h3>
-                <p class="text-slate-400 font-medium max-w-sm mx-auto mt-2 italic">Wah, sepertinya belum ada koleksi tanaman obat untuk wilayah ini.</p>
-                <a href="{{ route('plant.koleksi') }}" class="inline-block mt-8 px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-emerald-600 transition shadow-lg">Lihat Semua Tanaman</a>
+            <div class="col-span-full py-24 text-center" data-aos="fade-up">
+                <div class="text-7xl mb-5">🔍</div>
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-3">Tidak Ada Hasil</h3>
+                <p class="text-slate-500 dark:text-slate-400 mb-8 max-w-sm mx-auto">Belum ada tanaman untuk pencarian atau filter yang dipilih.</p>
+                <a href="{{ route('plant.koleksi') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition">
+                    Tampilkan Semua
+                </a>
             </div>
             @endforelse
         </div>
     </main>
-
-</body>
-</html>
+</div>
+@endsection

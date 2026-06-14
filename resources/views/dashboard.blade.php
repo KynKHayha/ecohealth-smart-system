@@ -1,170 +1,160 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin | Eco Health</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
-</head>
-<body class="bg-slate-50 flex min-h-screen">
+@extends('layouts.admin')
+@section('title', 'Dasbor Tanaman')
 
-    <aside class="w-72 bg-emerald-950 text-white flex flex-col p-8 fixed h-full shadow-2xl z-20">
-        <div class="flex items-center gap-3 mb-12">
-            <img src="{{ asset('images/Logo_ppk.jpeg') }}" alt="Logo PPK" class="w-12 h-12 object-contain group-hover:scale-110 transition duration-300">
-            <span class="text-xl font-800 tracking-tighter">EcoHealth</span>
-        </div>
-            <nav class="flex-grow space-y-4">
-    <a href="{{ route('dashboard') }}" class="flex items-center gap-4 {{ request()->routeIs('dashboard') ? 'bg-white/10 text-emerald-400' : 'text-slate-400 hover:bg-white/5 hover:text-white' }} px-6 py-4 rounded-2xl font-bold transition">
-        <span>📊</span> Dasbor Tanaman
-    </a>
-    
-    <a href="{{ route('tips.manage') }}" class="flex items-center gap-4 {{ request()->routeIs('tips.manage') ? 'bg-white/10 text-emerald-400' : 'text-slate-400 hover:bg-white/5 hover:text-white' }} px-6 py-4 rounded-2xl font-bold transition">
-        <span>💡</span> Tips Kesehatan
-    </a>
-    <a href="{{ route('lansia.index') }}" class="flex items-center gap-4 {{ request()->routeIs('lansia.*') ? 'bg-white/10 text-emerald-400' : 'text-slate-400 hover:bg-white/5' }} px-6 py-4 rounded-2xl font-bold transition">
-    <span>👴</span> Data Lansia & Penyakit
-</a>
-</nav>
-
-        <form action="{{ route('logout') }}" method="POST" class="mt-auto">
-            @csrf
-            <button type="submit" class="w-full flex items-center gap-4 hover:bg-red-500/20 px-6 py-4 rounded-2xl text-red-400 transition font-bold">
-                <span>🚪</span> Keluar
-            </button>
-        </form>
-    </aside>
-
-    <main class="flex-grow ml-72 p-12">
-        <header class="flex justify-between items-center mb-12">
-            <div>
-                <h1 class="text-3xl font-800 text-slate-900 tracking-tight">Ringkasan Sistem</h1>
-                <p class="text-slate-500 font-medium">Manajemen Tanaman & Edukasi Desa Mekarjaya</p>
-            </div>
-            <div class="flex gap-4">
-    <a href="{{ route('plant.cetak') }}" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-800 shadow-xl hover:bg-slate-700 transition-all">
-        📄 Cetak PDF
-    </a>
-    <a href="{{ route('plant.create') }}" class="bg-emerald-600 text-white px-6 py-4 rounded-2xl font-800 shadow-xl hover:bg-emerald-700 transition-all">
-        + Tambah Baru
-    </a>
-</div>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100">
-                <p class="text-xs font-black text-slate-400 uppercase mb-2">Total Spesies</p>
-                <h3 class="text-4xl font-800 text-slate-900">{{ $plants->count() }}</h3>
-            </div>
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-4 border-l-emerald-500">
-                <p class="text-xs font-black text-emerald-600 uppercase mb-2">Total Stok</p>
-                <h3 class="text-4xl font-800 text-slate-900">{{ $total_bibit }}</h3>
-            </div>
-            <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 border-l-4 border-l-amber-500">
-                <p class="text-xs font-black text-amber-600 uppercase mb-2">Stok Menipis</p>
-                <h3 class="text-4xl font-800 text-slate-900">{{ $stok_menipis }}</h3>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-[3rem] shadow-sm border border-slate-100 overflow-hidden mb-12">
-            <div class="p-8 border-b border-slate-50 flex justify-between items-center">
-                <h3 class="font-800 text-slate-900 text-lg">Daftar Tanaman Obat</h3>
-                <div class="flex gap-2">
-                    <a href="{{ route('dashboard') }}" class="px-4 py-2 rounded-xl text-xs font-bold {{ !request('rw') ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400' }}">Semua</a>
-                    <a href="{{ route('dashboard', ['rw' => '2']) }}" class="px-4 py-2 rounded-xl text-xs font-bold {{ request('rw') == '2' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400' }}">RW 02</a>
-                    <a href="{{ route('dashboard', ['rw' => '3']) }}" class="px-4 py-2 rounded-xl text-xs font-bold {{ request('rw') == '3' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400' }}">RW 03</a>
-                    <a href="{{ route('dashboard', ['rw' => '4']) }}" class="px-4 py-2 rounded-xl text-xs font-bold {{ request('rw') == '4' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-400' }}">RW 04</a>
-                </div>
-                <div class="mb-6 relative group">
-    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-        <span class="text-slate-400 group-focus-within:text-emerald-500 transition-colors">🔍</span>
+@section('content')
+{{-- Header --}}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Ringkasan Sistem</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">Manajemen Tanaman & Edukasi Desa Mekarjaya</p>
     </div>
-    <input type="text" id="searchInput" onkeyup="searchTable()" 
-        placeholder="Cari nama tanaman atau kategori..." 
-        class="w-full bg-white border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all shadow-sm">
+    <div class="flex items-center gap-3 flex-shrink-0">
+        <a href="{{ route('plant.cetak') }}" class="flex items-center gap-2 px-5 py-3 bg-slate-800 dark:bg-slate-700 text-white rounded-2xl font-bold text-sm hover:bg-slate-700 dark:hover:bg-slate-600 transition-all shadow-lg">
+            📄 Cetak PDF
+        </a>
+        <a href="{{ route('plant.create') }}" class="flex items-center gap-2 px-5 py-3 bg-emerald-600 text-white rounded-2xl font-bold text-sm hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20">
+            + Tambah Tanaman
+        </a>
+    </div>
 </div>
-            </div>
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    <tr>
-                        <th class="px-8 py-6">Tanaman</th>
-                        <th class="px-8 py-6">Lokasi</th>
-                        <th class="px-8 py-6 text-center">Stok</th>
-                        <th class="px-8 py-6">Status</th>
-                        <th class="px-8 py-6 text-center">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-50">
-                    @foreach($plants as $p)
-                    <tr class="hover:bg-slate-50/50 transition">
-                        <td class="px-8 py-6">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-lg overflow-hidden bg-slate-100">
-                                    @if($p->image)
-                                        <img src="{{ asset('images/plants/' . $p->image) }}" class="w-full h-full object-cover">
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center text-lg">🌿</div>
-                                    @endif
-                                </div>
-                                <span class="font-bold text-slate-900 text-sm">{{ $p->nama_tanaman }}</span>
-                            </div>
-                        </td>
-                        <td class="px-8 py-6 text-xs font-bold text-slate-500">🏡 RW 0{{ $p->rw }}</td>
-                        <td class="px-8 py-6 text-center font-black text-slate-900">{{ $p->stok }}</td>
-                        <td class="px-8 py-6">
-                            @if($p->stok <= $p->min_stok)
-                                <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Menipis</span>
-                            @else
-                                <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">Aman</span>
-                            @endif
-                        </td>
-                        <td class="px-8 py-6 text-center">
-                            <div class="flex justify-center gap-4">
-                                <a href="{{ route('plant.edit', $p->id) }}" class="text-emerald-600 hover:text-emerald-800 font-bold text-xs">Edit</a>
-                                <form action="{{ route('plant.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus?')">
-                                    @csrf @method('DELETE')
-                                    <button class="text-red-400 hover:text-red-600 font-bold text-xs">Hapus</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+
+{{-- Stats Cards --}}
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 border border-slate-100 dark:border-slate-700 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <p class="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Total Spesies</p>
+            <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-xl">🌿</div>
         </div>
+        <h3 class="text-4xl font-black text-slate-900 dark:text-white">{{ $plants->count() }}</h3>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 font-medium">Jenis tanaman terdaftar</p>
+    </div>
 
-    <script>
-        function openModalTip() { document.getElementById('modalTip').classList.remove('hidden'); }
-        function closeModalTip() { document.getElementById('modalTip').classList.add('hidden'); }
-    </script>
-    <script>
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 border border-slate-100 dark:border-slate-700 shadow-sm border-l-4 border-l-emerald-500">
+        <div class="flex items-center justify-between mb-4">
+            <p class="text-xs font-black text-emerald-600 uppercase tracking-widest">Total Stok Bibit</p>
+            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-xl">🌱</div>
+        </div>
+        <h3 class="text-4xl font-black text-slate-900 dark:text-white">{{ $total_bibit }}</h3>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 font-medium">Total bibit tersedia</p>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-7 border border-slate-100 dark:border-slate-700 shadow-sm border-l-4 border-l-amber-500">
+        <div class="flex items-center justify-between mb-4">
+            <p class="text-xs font-black text-amber-600 uppercase tracking-widest">Stok Menipis</p>
+            <div class="w-10 h-10 bg-amber-50 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center text-xl">⚠️</div>
+        </div>
+        <h3 class="text-4xl font-black text-slate-900 dark:text-white">{{ $stok_menipis }}</h3>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 font-medium">Perlu pengisian ulang</p>
+    </div>
+</div>
+
+{{-- Plants Table --}}
+<div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+    {{-- Table Header --}}
+    <div class="p-6 border-b border-slate-50 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h3 class="font-black text-slate-900 dark:text-white">Daftar Tanaman Obat</h3>
+            <p class="text-xs text-slate-400 dark:text-slate-500 font-medium mt-0.5">Semua koleksi TOGA Desa Mekarjaya</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+            {{-- RW Filter --}}
+            <a href="{{ route('dashboard') }}" class="px-3 py-1.5 rounded-xl text-xs font-bold {{ !request('rw') ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600' }} transition-all">Semua</a>
+            <a href="{{ route('dashboard', ['rw'=>'2']) }}" class="px-3 py-1.5 rounded-xl text-xs font-bold {{ request('rw')=='2' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600' }} transition-all">RW 02</a>
+            <a href="{{ route('dashboard', ['rw'=>'3']) }}" class="px-3 py-1.5 rounded-xl text-xs font-bold {{ request('rw')=='3' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600' }} transition-all">RW 03</a>
+            <a href="{{ route('dashboard', ['rw'=>'4']) }}" class="px-3 py-1.5 rounded-xl text-xs font-bold {{ request('rw')=='4' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600' }} transition-all">RW 04</a>
+
+            {{-- Search --}}
+            <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+                <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Cari tanaman..."
+                    class="pl-9 pr-4 py-1.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all w-40 sm:w-48">
+            </div>
+        </div>
+    </div>
+
+    {{-- Table --}}
+    <div class="overflow-x-auto">
+        <table class="w-full text-left min-w-[640px]" id="plantsTable">
+            <thead class="bg-slate-50 dark:bg-slate-700/50 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                <tr>
+                    <th class="px-6 py-4">Tanaman</th>
+                    <th class="px-6 py-4">Kategori</th>
+                    <th class="px-6 py-4">Lokasi</th>
+                    <th class="px-6 py-4 text-center">Stok</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4 text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50 dark:divide-slate-700">
+                @forelse($plants as $p)
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
+                    {{-- Tanaman --}}
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700 flex-shrink-0">
+                                @if($p->image)
+                                <img src="{{ asset('images/plants/' . $p->image) }}" class="w-full h-full object-cover">
+                                @else
+                                <div class="w-full h-full flex items-center justify-center text-lg">🌿</div>
+                                @endif
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-900 dark:text-white text-sm">{{ $p->nama_tanaman }}</p>
+                                <p class="text-xs italic text-slate-400 dark:text-slate-500">{{ $p->nama_latin }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    {{-- Kategori --}}
+                    <td class="px-6 py-4">
+                        <span class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 rounded-lg text-[11px] font-black">{{ $p->kategori }}</span>
+                    </td>
+                    {{-- Lokasi --}}
+                    <td class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400">📍 RW 0{{ $p->rw }}</td>
+                    {{-- Stok --}}
+                    <td class="px-6 py-4 text-center font-black text-slate-900 dark:text-white">{{ $p->stok }}</td>
+                    {{-- Status --}}
+                    <td class="px-6 py-4">
+                        @if($p->stok <= $p->min_stok)
+                        <span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-3 py-1 rounded-full text-[10px] font-black uppercase">Menipis</span>
+                        @else
+                        <span class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-[10px] font-black uppercase">Aman</span>
+                        @endif
+                    </td>
+                    {{-- Aksi --}}
+                    <td class="px-6 py-4">
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="{{ route('plant.print', $p->id) }}" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition" title="Print QR">🏷️</a>
+                            <a href="{{ route('plant.edit', $p->id) }}" class="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold hover:bg-emerald-100 dark:hover:bg-emerald-800/30 transition">Edit</a>
+                            <form action="{{ route('plant.destroy', $p->id) }}" method="POST" onsubmit="return confirm('Hapus tanaman {{ $p->nama_tanaman }}?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="px-3 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 rounded-lg text-xs font-bold hover:bg-red-100 dark:hover:bg-red-900/30 transition">Hapus</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="px-6 py-16 text-center text-slate-400 dark:text-slate-500">
+                        <div class="text-5xl mb-3">🌿</div>
+                        <p class="font-bold">Belum ada data tanaman</p>
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
+<script>
 function searchTable() {
-    // Ambil input dan ubah jadi huruf kecil (biar gak sensitif huruf besar/kecil)
-    let input = document.getElementById("searchInput");
-    let filter = input.value.toLowerCase();
-    let table = document.querySelector("table"); // Pastikan ini target ke tabel tanaman
-    let tr = table.getElementsByTagName("tr");
-
-    // Loop semua baris tabel (mulai dari baris ke-1 karena ke-0 itu header)
-    for (let i = 1; i < tr.length; i++) {
-        let tdNama = tr[i].getElementsByTagName("td")[0]; // Kolom Nama Tanaman
-        let tdKategori = tr[i].getElementsByTagName("td")[2]; // Kolom Kategori (Sesuaikan urutan kolommu)
-        
-        if (tdNama || tdKategori) {
-            let txtNama = tdNama.textContent || tdNama.innerText;
-            let txtKategori = tdKategori.textContent || tdKategori.innerText;
-            
-            // Cek apakah ada kata yang cocok di nama atau kategori
-            if (txtNama.toLowerCase().indexOf(filter) > -1 || txtKategori.toLowerCase().indexOf(filter) > -1) {
-                tr[i].style.display = ""; // Munculkan
-            } else {
-                tr[i].style.display = "none"; // Sembunyikan
-            }
-        }
-    }
+    const filter = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('#plantsTable tbody tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
 }
 </script>
-</body>
-</html>
-
+@endsection

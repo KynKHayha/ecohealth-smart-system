@@ -22,3 +22,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Binary tools — jangan masuk Git
+ngrok.exe
+*.exe
+
+# SQLite database — berisi data asli, jangan di-commit
+/database/*.sqlite

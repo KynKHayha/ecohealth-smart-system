@@ -9,18 +9,20 @@ class Plant extends Model
 {
     use HasFactory;
 
-    // Tambahkan baris ini agar semua kolom bisa diisi secara otomatis
-    protected $guarded = []; 
+    /**
+     * Kolom yang boleh diisi secara mass-assignment (whitelist approach).
+     * Hapus $guarded = [] karena kontradiksi dengan $fillable.
+     */
     protected $fillable = [
-    'nama_tanaman', 
-    'nama_latin', 
-    'image', 
-    'kategori', 
-    'rw', // <--- Tambahkan ini
-    'manfaat', 
-    'cara_olah', 
-    'stok', 
-    'min_stok', 
-    'slug'
-];
+        'nama_tanaman',
+        'nama_latin',
+        'image',
+        'kategori',
+        'rw',
+        'manfaat',
+        'cara_olah',
+        'stok',
+        'min_stok',
+        'slug',
+    ];
 }

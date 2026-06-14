@@ -1,5 +1,4 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\PlantController;
@@ -7,30 +6,25 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LansiaController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes - EcoHealth
 |--------------------------------------------------------------------------
 */
-
 // --- HALAMAN PUBLIK (TANPA LOGIN) ---
 Route::get('/', [PlantController::class, 'index'])->name('index');
 Route::get('/koleksi', [PlantController::class, 'koleksi'])->name('plant.koleksi');
 Route::get('/tanaman/{slug}', [PlantController::class, 'detail'])->name('plant.detail');
 Route::get('/scan', function () { return view('scan'); })->name('plant.scan');
 Route::get('/tips', [PlantController::class, 'tips'])->name('plant.tips');
-
 // --- AUTHENTICATION (LOGIN & LUPA PASSWORD) ---
 Route::get('/login', function () { return view('login'); })->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
 Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
 Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('password.update');
-
 // --- HALAMAN ADMIN (PERLU LOGIN) ---
 Route::middleware(['auth'])->group(function () {
     
@@ -44,12 +38,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/plant/{id}', [PlantController::class, 'destroy'])->name('plant.destroy');
     Route::get('/plant/print/{id}', [PlantController::class, 'printLabel'])->name('plant.print');
     Route::get('/dashboard/cetak-laporan', [PlantController::class, 'cetakLaporan'])->name('plant.cetak');
-
     // 2. TIPS KESEHATAN
     Route::get('/dashboard/tips', [PlantController::class, 'manageTips'])->name('tips.manage');
     Route::post('/tips/store', [PlantController::class, 'storeTip'])->name('tips.store');
     Route::delete('/tips/{id}', [PlantController::class, 'destroyTip'])->name('tips.destroy');
-
     // 3. MANAJEMEN LANSIA (URUTAN KRUSIAL BIAR TIDAK 404)
     // Rute Spesifik/Custom taruh di ATAS
     Route::delete('/admin/lansia/bulk-delete', [LansiaController::class, 'bulkDelete'])->name('lansia.bulkDelete');
@@ -63,6 +55,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/lansia/import', [LansiaController::class, 'import'])->name('lansia.import');
     
     // Rute dengan Parameter {id} taruh di PALING BAWAH
+    Route::get('/admin/lansia/export', [LansiaController::class, 'export'])->name('lansia.export');
     Route::get('/admin/lansia/kartu/{id}', [LansiaController::class, 'cetakKartu'])->name('lansia.kartu');
     Route::delete('/admin/lansia/{id}', [LansiaController::class, 'destroy'])->name('lansia.destroy');
+
+    // 4. MANAJEMEN LOKASI / PETA
+    Route::get('/admin/tracking', [App\Http\Controllers\LocationController::class, 'index'])->name('location.index');
+    Route::post('/admin/tracking', [App\Http\Controllers\LocationController::class, 'store'])->name('location.store');
+    Route::delete('/admin/tracking/{id}', [App\Http\Controllers\LocationController::class, 'destroy'])->name('location.destroy');
 });
+Route::get('/tracking', [App\Http\Controllers\LocationController::class, 'trackingUser'])->name('plant.tracking');
+
+Route::post('/contact-send', [App\Http\Controllers\PlantController::class, 'sendEmail'])->name('contact.send');
+// Halaman Tampilan Form
+Route::get('/hubungi-kami', function () {
+    return view('kontak');
+})->name('kontak');
+
+// Proses Pengiriman Email
